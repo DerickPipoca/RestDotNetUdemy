@@ -15,12 +15,23 @@ namespace RestDotNetUdemy.Controllers
         }
 
         [HttpGet("sum/{firstNum}/{secondNum}")]
-        public IActionResult Get(string firstNum, string secondNum)
+        public IActionResult Sum(string firstNum, string secondNum)
         {
             if (IsNumber(firstNum) && IsNumber(secondNum))
             {
                 var sum = ConvertToDecimal(firstNum) + ConvertToDecimal(secondNum);
                 return Ok(sum);
+            }
+            return BadRequest("Invalid output!");
+        }
+
+        [HttpGet("subtract/{firstNum}/{secondNum}")]
+        public IActionResult Subtraction(string firstNum, string secondNum)
+        {
+            if (IsNumber(firstNum) && IsNumber(secondNum))
+            {
+                var subtract = ConvertToDecimal(firstNum) - ConvertToDecimal(secondNum);
+                return Ok(subtract);
             }
             return BadRequest("Invalid output!");
         }
