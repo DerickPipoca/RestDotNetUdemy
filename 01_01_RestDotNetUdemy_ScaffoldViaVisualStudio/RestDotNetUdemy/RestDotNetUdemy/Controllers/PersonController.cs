@@ -1,102 +1,67 @@
-using System.Globalization;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using RestDotNetUdemy.Models;
+using RestDotNetUdemy.Services;
 
 namespace RestDotNetUdemy.Controllers
 {
+    [ApiVersion("1")]
     [ApiController]
-    [Route("[controller]")]
-    public class CalculatorController : ControllerBase
+    [Route("api/[controller]/v{version:apiVersion}")]
+    public class PersonController : ControllerBase
     {
-        private readonly ILogger<CalculatorController> _logger;
+        private readonly ILogger<PersonController> _logger;
+        private readonly IPersonService _personService;
 
-        public CalculatorController(ILogger<CalculatorController> logger)
+
+        public PersonController(ILogger<PersonController> logger, IPersonService personService)
         {
             _logger = logger;
+            _personService = personService;
         }
 
-        [HttpGet("sum/{firstNum}/{secondNum}")]
-        public IActionResult Sum(string firstNum, string secondNum)
+        [HttpGet]
+        public IActionResult Get()
         {
-            if (IsNumber(firstNum) && IsNumber(secondNum))
+            return Ok(_personService.FindAll());
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult Get(long id)
+        {
+            var person = _personService.FindById(id);
+            if (person == null)
             {
-                var sum = ConvertToDecimal(firstNum) + ConvertToDecimal(secondNum);
-                return Ok(sum);
+                return NotFound();
             }
-            return BadRequest("Invalid output!");
+            return Ok(person);
         }
 
-        [HttpGet("subtract/{firstNum}/{secondNum}")]
-        public IActionResult Subtract(string firstNum, string secondNum)
+        [HttpPost]
+        public IActionResult Post([FromBody] Person person)
         {
-            if (IsNumber(firstNum) && IsNumber(secondNum))
+            if (person == null)
             {
-                var subtract = ConvertToDecimal(firstNum) - ConvertToDecimal(secondNum);
-                return Ok(subtract);
+                return BadRequest();
             }
-            return BadRequest("Invalid output!");
+            return Ok(_personService.Create(person));
         }
 
-        [HttpGet("multiplication/{firstNum}/{secondNum}")]
-        public IActionResult Multiplication(string firstNum, string secondNum)
+        [HttpPut]
+        public IActionResult Put([FromBody] Person person)
         {
-            if (IsNumber(firstNum) && IsNumber(secondNum))
+            if (person == null)
             {
-                var multiplication = ConvertToDecimal(firstNum) * ConvertToDecimal(secondNum);
-                return Ok(multiplication);
+                return BadRequest();
             }
-            return BadRequest("Invalid output!");
+            return Ok(_personService.Update(person));
         }
 
-        [HttpGet("division/{firstNum}/{secondNum}")]
-        public IActionResult Division(string firstNum, string secondNum)
+        [HttpDelete("{id}")]
+        public IActionResult Delete(long id)
         {
-            if (IsNumber(firstNum) && IsNumber(secondNum))
-            {
-                try
-                {
-                    var division = ConvertToDecimal(firstNum) / ConvertToDecimal(secondNum);
-                    return Ok(division);
-                }
-                catch (DivideByZeroException ex)
-                {
-                    return BadRequest($"{ex.Message} - Can't divide by zero.");
-                }
-            }
-            return BadRequest("Invalid output!");
-        }
-
-        [HttpGet("average/{firstNum}/{secondNum}")]
-        public IActionResult Average(string firstNum, string secondNum)
-        {
-            if (IsNumber(firstNum) && IsNumber(secondNum))
-            {
-                var average = (ConvertToDecimal(firstNum) + ConvertToDecimal(secondNum)) / (decimal)2;
-                return Ok(average);
-            }
-            return BadRequest("Invalid output!");
-        }
-
-        [HttpGet("squareroot/{num}")]
-        public IActionResult SquareRoot(string num)
-        {
-            if (IsNumber(num))
-            {
-                var squareRoot = Math.Sqrt((double)ConvertToDecimal(num));
-                return Ok(squareRoot);
-            }
-            return BadRequest("Invalid output!");
-        }
-
-        private static decimal ConvertToDecimal(string strNumber)
-        {
-            var result = decimal.TryParse(strNumber, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal number) ? number : 0;
-            return number;
-        }
-
-        private static bool IsNumber(string strNumber)
-        {
-            bool isNum = double.TryParse(strNumber, NumberStyles.Any, CultureInfo.InvariantCulture, out double number);
-            return isNum;
+            _personService.Delete(id);
+            return NoContent();
         }
     }
 }
