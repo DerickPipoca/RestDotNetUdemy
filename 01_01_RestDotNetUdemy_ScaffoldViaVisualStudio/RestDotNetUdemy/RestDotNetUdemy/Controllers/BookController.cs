@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using RestDotNetUdemy.Models;
 using RestDotNetUdemy.Business;
+using RestDotNetUdemy.Data.VO;
 
 namespace RestDotNetUdemy.Controllers
 {
@@ -38,7 +38,7 @@ namespace RestDotNetUdemy.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody] Book book)
+        public IActionResult Post([FromBody] BookVO book)
         {
             if (book == null)
             {
@@ -48,7 +48,7 @@ namespace RestDotNetUdemy.Controllers
         }
 
         [HttpPut]
-        public IActionResult Put([FromBody] Book book)
+        public IActionResult Put([FromBody] BookVO book)
         {
             if (book == null)
             {

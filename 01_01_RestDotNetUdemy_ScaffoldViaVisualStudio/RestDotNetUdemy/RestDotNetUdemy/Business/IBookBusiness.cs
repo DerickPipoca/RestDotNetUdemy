@@ -1,13 +1,13 @@
-using RestDotNetUdemy.Models;
+using RestDotNetUdemy.Data.VO;
 
 namespace RestDotNetUdemy.Business
 {
     public interface IBookBusiness
     {
-        Book Create(Book person);
-        Book? FindById(long id);
-        List<Book> FindAll();
-        Book? Update(Book person);
+        BookVO Create(BookVO person);
+        BookVO FindById(long id);
+        List<BookVO> FindAll();
+        BookVO Update(BookVO person);
         void Delete(long id);
     }
 }
