@@ -1,11 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using RestDotNetUdemy.Models.Context;
-using RestDotNetUdemy.Services;
-using RestDotNetUdemy.Services.Implementations;
+using RestDotNetUdemy.Business;
+using RestDotNetUdemy.Business.Implementations;
+using Serilog;
+using MySqlConnector;
+using EvolveDb;
+using RestDotNetUdemy.Repository.Generic;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add Business to the container.
 builder.Services.AddControllers();
 
 string? connection = builder.Configuration["MySQLConnection:MySQLConnectionString"];
@@ -15,11 +19,19 @@ builder.Services.AddDbContext<MySQLContext>(options => options.UseMySql(
     new MySqlServerVersion(new Version(8, 4, 4)))
 );
 
+if (builder.Environment.IsDevelopment())
+{
+    MigrateDatabase(connection);
+}
+
 // Versioning API
 builder.Services.AddApiVersioning();
 
 // Dependency Injection
-builder.Services.AddScoped<IPersonService, PersonServiceImplementation>();
+builder.Services.AddScoped<IPersonBusiness, PersonBusinessImplementation>();
+builder.Services.AddScoped<IBookBusiness, BookBusinessImplementation>();
+
+builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
 
 var app = builder.Build();
 
@@ -32,3 +44,22 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+void MigrateDatabase(string? connection)
+{
+    try
+    {
+        var evolveConnection = new MySqlConnection(connection);
+        var evolve = new Evolve(evolveConnection, Log.Information)
+        {
+            Locations = new List<string> { "db/migrations", "db/dataset" },
+            IsEraseDisabled = true
+        };
+        evolve.Migrate();
+    }
+    catch (Exception ex)
+    {
+        Log.Error("Database migration failed " + ex);
+        throw;
+    }
+}
