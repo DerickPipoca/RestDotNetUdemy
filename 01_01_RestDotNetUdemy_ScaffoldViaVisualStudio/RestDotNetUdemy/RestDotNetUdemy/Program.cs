@@ -6,6 +6,10 @@ using Serilog;
 using MySqlConnector;
 using EvolveDb;
 using RestDotNetUdemy.Repository.Generic;
+using System.Net.Http.Headers;
+using Microsoft.Net.Http.Headers;
+using RestDotNetUdemy.Hypermedia.Filters;
+using RestDotNetUdemy.Hypermedia.Enricher;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +27,12 @@ if (builder.Environment.IsDevelopment())
 {
     MigrateDatabase(connection);
 }
+
+var filterOptions = new HyperMediaFilterOptions();
+filterOptions.ContentResponseEnricherList.Add(new PersonEnricher());
+filterOptions.ContentResponseEnricherList.Add(new BookEnricher());
+
+builder.Services.AddSingleton(filterOptions);
 
 // Versioning API
 builder.Services.AddApiVersioning();
@@ -42,6 +52,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapControllerRoute("DefaultApi", "{controller=values}/v{version=apiVersion}/{id?}");
 
 app.Run();
 

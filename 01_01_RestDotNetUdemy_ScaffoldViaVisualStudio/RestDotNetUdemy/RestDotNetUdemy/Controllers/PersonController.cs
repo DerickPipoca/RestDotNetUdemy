@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using RestDotNetUdemy.Models;
 using RestDotNetUdemy.Business;
 using RestDotNetUdemy.Data.VO;
+using RestDotNetUdemy.Hypermedia.Filters;
 
 namespace RestDotNetUdemy.Controllers
 {
@@ -22,12 +23,14 @@ namespace RestDotNetUdemy.Controllers
         }
 
         [HttpGet]
+        [TypeFilter(typeof(HyperMediaFilter))]
         public IActionResult Get()
         {
             return Ok(_personBusiness.FindAll());
         }
 
         [HttpGet("{id}")]
+        [TypeFilter(typeof(HyperMediaFilter))]
         public IActionResult Get(long id)
         {
             var person = _personBusiness.FindById(id);
@@ -39,6 +42,7 @@ namespace RestDotNetUdemy.Controllers
         }
 
         [HttpPost]
+        [TypeFilter(typeof(HyperMediaFilter))]
         public IActionResult Post([FromBody] PersonVO person)
         {
             if (person == null)
@@ -49,6 +53,7 @@ namespace RestDotNetUdemy.Controllers
         }
 
         [HttpPut]
+        [TypeFilter(typeof(HyperMediaFilter))]
         public IActionResult Put([FromBody] PersonVO person)
         {
             if (person == null)
@@ -59,6 +64,7 @@ namespace RestDotNetUdemy.Controllers
         }
 
         [HttpDelete("{id}")]
+        [TypeFilter(typeof(HyperMediaFilter))]
         public IActionResult Delete(long id)
         {
             _personBusiness.Delete(id);

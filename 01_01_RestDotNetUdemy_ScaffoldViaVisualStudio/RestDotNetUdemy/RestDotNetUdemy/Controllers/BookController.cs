@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using RestDotNetUdemy.Business;
 using RestDotNetUdemy.Data.VO;
+using RestDotNetUdemy.Hypermedia.Filters;
 
 namespace RestDotNetUdemy.Controllers
 {
@@ -21,12 +22,14 @@ namespace RestDotNetUdemy.Controllers
         }
 
         [HttpGet]
+        [TypeFilter(typeof(HyperMediaFilter))]
         public IActionResult Get()
         {
             return Ok(_bookBusiness.FindAll());
         }
 
         [HttpGet("{id}")]
+        [TypeFilter(typeof(HyperMediaFilter))]
         public IActionResult Get(long id)
         {
             var book = _bookBusiness.FindById(id);
@@ -38,6 +41,7 @@ namespace RestDotNetUdemy.Controllers
         }
 
         [HttpPost]
+        [TypeFilter(typeof(HyperMediaFilter))]
         public IActionResult Post([FromBody] BookVO book)
         {
             if (book == null)
@@ -48,6 +52,7 @@ namespace RestDotNetUdemy.Controllers
         }
 
         [HttpPut]
+        [TypeFilter(typeof(HyperMediaFilter))]
         public IActionResult Put([FromBody] BookVO book)
         {
             if (book == null)
@@ -58,6 +63,7 @@ namespace RestDotNetUdemy.Controllers
         }
 
         [HttpDelete("{id}")]
+        [TypeFilter(typeof(HyperMediaFilter))]
         public IActionResult Delete(long id)
         {
             _bookBusiness.Delete(id);
